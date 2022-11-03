@@ -2250,6 +2250,10 @@ class ColumnMapExpectation(TableExpectation, ABC):
             "include_unexpected_rows"
         )
 
+        include_unexpected_index_columns = dependencies["result_format"].get(
+            "include_unexpected_index_columns"
+        )
+
         if result_format_str == "BOOLEAN_ONLY":
             return dependencies
 
@@ -2283,16 +2287,16 @@ class ColumnMapExpectation(TableExpectation, ABC):
         if result_format_str in ["BASIC", "SUMMARY"]:
             return dependencies
 
-        if include_unexpected_rows:
+        if include_unexpected_index_columns:
             metric_kwargs = get_metric_kwargs(
-                f"{self.map_metric}.unexpected_rows",
+                f"{self.map_metric}.include_unexpected_index_columns",
                 configuration=configuration,
                 runtime_configuration=runtime_configuration,
             )
             metric_dependencies[
-                f"{self.map_metric}.unexpected_rows"
+                f"{self.map_metric}.include_unexpected_index_columns"
             ] = MetricConfiguration(
-                metric_name=f"{self.map_metric}.unexpected_rows",
+                metric_name=f"{self.map_metric}.include_unexpected_index_columns",
                 metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
@@ -2325,10 +2329,10 @@ class ColumnMapExpectation(TableExpectation, ABC):
         ] = self.get_result_format(
             configuration=configuration, runtime_configuration=runtime_configuration
         )
-        if isinstance(result_format, dict):
-            include_unexpected_rows = result_format.get(
-                "include_unexpected_rows", False
-            )
+        include_unexpected_rows = result_format.get("include_unexpected_rows")
+        include_unexpected_index_columns = result_format.get(
+            "include_unexpected_index_columns"
+        )
 
         total_count: Optional[int] = metrics.get("table.row_count")
         null_count: Optional[int] = metrics.get(
@@ -2344,8 +2348,13 @@ class ColumnMapExpectation(TableExpectation, ABC):
             f"{self.map_metric}.unexpected_index_list"
         )
         unexpected_rows = None
+        unexpected_index_columns = None
         if include_unexpected_rows:
             unexpected_rows = metrics.get(f"{self.map_metric}.unexpected_rows")
+        if include_unexpected_index_columns:
+            unexpected_index_columns = metrics.get(
+                f"{self.map_metric}.unexpected_index_columns"
+            )
 
         if total_count is None or null_count is None:
             total_count = nonnull_count = 0
@@ -2373,6 +2382,7 @@ class ColumnMapExpectation(TableExpectation, ABC):
             unexpected_list=unexpected_values,
             unexpected_index_list=unexpected_index_list,
             unexpected_rows=unexpected_rows,
+            unexpected_index_columns=unexpected_index_columns,
         )
 
 
@@ -2483,6 +2493,9 @@ class ColumnPairMapExpectation(TableExpectation, ABC):
         include_unexpected_rows: Optional[bool] = dependencies["result_format"].get(
             "include_unexpected_rows"
         )
+        include_unexpected_index_columns = dependencies["result_format"].get(
+            "include_unexpected_index_columns"
+        )
 
         if result_format_str == "BOOLEAN_ONLY":
             return dependencies
@@ -2513,6 +2526,20 @@ class ColumnPairMapExpectation(TableExpectation, ABC):
                 f"{self.map_metric}.unexpected_rows"
             ] = MetricConfiguration(
                 metric_name=f"{self.map_metric}.unexpected_rows",
+                metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
+                metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
+            )
+
+        if include_unexpected_index_columns:
+            metric_kwargs = get_metric_kwargs(
+                f"{self.map_metric}.unexpected_index_columns",
+                configuration=configuration,
+                runtime_configuration=runtime_configuration,
+            )
+            metric_dependencies[
+                f"{self.map_metric}.unexpected_index_columns"
+            ] = MetricConfiguration(
+                metric_name=f"{self.map_metric}.unexpected_index_columns",
                 metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
@@ -2693,6 +2720,9 @@ class MulticolumnMapExpectation(TableExpectation, ABC):
         include_unexpected_rows: Optional[bool] = dependencies["result_format"].get(
             "include_unexpected_rows"
         )
+        include_unexpected_index_columns = dependencies["result_format"].get(
+            "include_unexpected_index_columns"
+        )
 
         if result_format_str == "BOOLEAN_ONLY":
             return dependencies
@@ -2723,6 +2753,20 @@ class MulticolumnMapExpectation(TableExpectation, ABC):
                 f"{self.map_metric}.unexpected_rows"
             ] = MetricConfiguration(
                 metric_name=f"{self.map_metric}.unexpected_rows",
+                metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
+                metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
+            )
+
+        if include_unexpected_index_columns:
+            metric_kwargs = get_metric_kwargs(
+                f"{self.map_metric}.unexpected_index_columns",
+                configuration=configuration,
+                runtime_configuration=runtime_configuration,
+            )
+            metric_dependencies[
+                f"{self.map_metric}.unexpected_index_columns"
+            ] = MetricConfiguration(
+                metric_name=f"{self.map_metric}.unexpected_index_columns",
                 metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
@@ -2805,7 +2849,8 @@ def _format_map_output(
     unexpected_list: Optional[List[Any]] = None,
     unexpected_index_list: Optional[List[int]] = None,
     unexpected_rows=None,
-) -> Dict:
+    unexpected_index_columns=None,
+):
     """Helper function to construct expectation result objects for map_expectations (such as column_map_expectation
     and file_lines_map_expectation).
 
@@ -2870,6 +2915,13 @@ def _format_map_output(
         return_obj["result"].update(
             {
                 "unexpected_rows": unexpected_rows,
+            }
+        )
+
+    if result_format["include_unexpected_index_columns"]:
+        return_obj["result"].update(
+            {
+                "unexpected_index_columns": unexpected_index_columns,
             }
         )
 
