@@ -1209,10 +1209,10 @@ def multicolumn_condition_partial(
                         raise ge_exceptions.InvalidMetricAccessorDomainKwargsKeyError(
                             message=f'Error: The column "{column_name}" in BatchData does not exist.'
                         )
-
+                pandas_column_selector = df[column_list]
                 meets_expectation_series = metric_fn(
                     cls,
-                    df[column_list],
+                    pandas_column_selector,
                     **metric_value_kwargs,
                     _metrics=metrics,
                 )
@@ -2809,6 +2809,16 @@ class MapMetricProvider(MetricProvider):
                         metric_provider=_pandas_map_condition_rows,
                         metric_fn_type=MetricFunctionTypes.VALUE,
                     )
+                    register_metric(
+                        metric_name=f"{metric_name}.unexpected_index_columns",
+                        metric_domain_keys=metric_domain_keys,
+                        metric_value_keys=(*metric_value_keys, "result_format"),
+                        execution_engine=engine,
+                        metric_class=cls,
+                        metric_provider=_pandas_map_condition_rows,
+                        metric_fn_type=MetricFunctionTypes.VALUE,
+                    )
+
                     if domain_type == MetricDomainTypes.COLUMN:
                         register_metric(
                             metric_name=f"{metric_name}.unexpected_values",
@@ -2887,6 +2897,15 @@ class MapMetricProvider(MetricProvider):
                     )
                     if metric_fn_type == MetricPartialFunctionTypes.MAP_CONDITION_FN:
                         if domain_type == MetricDomainTypes.COLUMN:
+                            register_metric(
+                                metric_name=f"{metric_name}.unexpected_index_columns",
+                                metric_domain_keys=metric_domain_keys,
+                                metric_value_keys=(*metric_value_keys, "result_format"),
+                                execution_engine=engine,
+                                metric_class=cls,
+                                metric_provider=_sqlalchemy_map_condition_rows,
+                                metric_fn_type=MetricFunctionTypes.VALUE,
+                            )
                             register_metric(
                                 metric_name=metric_name
                                 + ".unexpected_count.aggregate_fn",
@@ -2997,6 +3016,15 @@ class MapMetricProvider(MetricProvider):
                     )
                     register_metric(
                         metric_name=f"{metric_name}.unexpected_rows",
+                        metric_domain_keys=metric_domain_keys,
+                        metric_value_keys=(*metric_value_keys, "result_format"),
+                        execution_engine=engine,
+                        metric_class=cls,
+                        metric_provider=_spark_map_condition_rows,
+                        metric_fn_type=MetricFunctionTypes.VALUE,
+                    )
+                    register_metric(
+                        metric_name=f"{metric_name}.unexpected_index_columns",
                         metric_domain_keys=metric_domain_keys,
                         metric_value_keys=(*metric_value_keys, "result_format"),
                         execution_engine=engine,
@@ -3176,6 +3204,7 @@ class MapMetricProvider(MetricProvider):
             ".unexpected_value_counts",
             ".unexpected_index_list",
             ".unexpected_rows",
+            ".unexpected_index_columns",
             ".filtered_row_count",
         ]:
             if metric_name.endswith(metric_suffix):

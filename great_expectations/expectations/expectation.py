@@ -2297,6 +2297,23 @@ class ColumnMapExpectation(TableExpectation, ABC):
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
 
+        if "unexpected_index_columns" in configuration.kwargs["result_format"]:
+            unexpected_index_columns = configuration.kwargs["result_format"][
+                "unexpected_index_columns"
+            ]
+            metric_kwargs = get_metric_kwargs(
+                f"{self.map_metric}.unexpected_index_columns",
+                configuration=configuration,
+                runtime_configuration=runtime_configuration,
+            )
+            metric_dependencies[
+                f"{self.map_metric}.unexpected_index_columns"
+            ] = MetricConfiguration(
+                metric_name=f"{self.map_metric}.unexpected_index_columns",
+                metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
+                metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
+            )
+            dep = f"{self.map_metric}.unexpected_index_columns"
         if isinstance(execution_engine, PandasExecutionEngine):
             metric_kwargs = get_metric_kwargs(
                 f"{self.map_metric}.unexpected_index_list",
@@ -2343,6 +2360,20 @@ class ColumnMapExpectation(TableExpectation, ABC):
         unexpected_index_list: Optional[List[int]] = metrics.get(
             f"{self.map_metric}.unexpected_index_list"
         )
+        unexpected_index_columns = metrics.get(
+            f"{self.map_metric}.unexpected_index_columns"
+        )
+        if unexpected_index_columns is not None:
+            unexpected_index_list: List[dict] = []
+            index_columns = configuration.kwargs["result_format"][
+                "unexpected_index_columns"
+            ]
+            indices = list(unexpected_index_columns.index.values)
+            for index in indices:
+                temp = dict()
+                for column in index_columns:
+                    temp[column] = unexpected_index_columns.at[index, column]
+                unexpected_index_list.append(temp)
         unexpected_rows = None
         if include_unexpected_rows:
             unexpected_rows = metrics.get(f"{self.map_metric}.unexpected_rows")
@@ -2363,7 +2394,6 @@ class ColumnMapExpectation(TableExpectation, ABC):
                     "mostly", self.default_kwarg_values.get("mostly")
                 ),
             )
-
         return _format_map_output(
             result_format=parse_result_format(result_format),
             success=success,
@@ -2723,6 +2753,20 @@ class MulticolumnMapExpectation(TableExpectation, ABC):
                 f"{self.map_metric}.unexpected_rows"
             ] = MetricConfiguration(
                 metric_name=f"{self.map_metric}.unexpected_rows",
+                metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
+                metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
+            )
+
+        if include_unexpected_index_columns:
+            metric_kwargs = get_metric_kwargs(
+                f"{self.map_metric}.unexpected_index_columns",
+                configuration=configuration,
+                runtime_configuration=runtime_configuration,
+            )
+            metric_dependencies[
+                f"{self.map_metric}.unexpected_index_columns"
+            ] = MetricConfiguration(
+                metric_name=f"{self.map_metric}.unexpected_index_columns",
                 metric_domain_kwargs=metric_kwargs["metric_domain_kwargs"],
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
