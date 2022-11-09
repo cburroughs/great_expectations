@@ -1821,6 +1821,38 @@ def _pandas_column_map_condition_value_counts(
         return value_counts[result_format["partial_unexpected_count"]]
 
 
+def _pandas_maps_condition_unexpected_index_columns(
+    cls,
+    execution_engine: PandasExecutionEngine,
+    metric_domain_kwargs: Dict,
+    metric_value_kwargs: Dict,
+    metrics: Dict[str, Any],
+    **kwargs,
+):
+    (
+        boolean_mapped_unexpected_values,
+        compute_domain_kwargs,
+        accessor_domain_kwargs,
+    ) = metrics.get("unexpected_condition")
+
+    unexpected_column_names_kwargs = dict()
+    if "unexpected_index_columns" in metric_value_kwargs["result_format"]:
+        index_column_names = metric_value_kwargs["result_format"].get(
+            "unexpected_index_columns"
+        )
+        for index_column_name in index_column_names:
+            if index_column_name not in metrics["table.columns"]:
+                raise ge_exceptions.InvalidMetricAccessorDomainKwargsKeyError(
+                    message=f'Error: The index column: "{index_column_name}" in does not exist.'
+                )
+        unexpected_column_names_kwargs["unexpected_index_columns"] = index_column_names
+    df = execution_engine.get_domain_records(
+        domain_kwargs=unexpected_column_names_kwargs,
+    )
+    print(f"this is the right place : {df}")
+    return df
+
+
 def _pandas_map_condition_rows(
     cls,
     execution_engine: PandasExecutionEngine,
@@ -1839,14 +1871,18 @@ def _pandas_map_condition_rows(
     In order to invoke the "ignore_row_if" filtering logic, "execution_engine.get_domain_records()" must be supplied
     with all of the available "domain_kwargs" keys.
     """
-    domain_kwargs = dict(**compute_domain_kwargs, **accessor_domain_kwargs)
+
+    domain_kwargs = dict(
+        **compute_domain_kwargs,
+        **accessor_domain_kwargs,
+    )
     df = execution_engine.get_domain_records(
         domain_kwargs=domain_kwargs,
     )
 
     if "column" in accessor_domain_kwargs:
         column_name = accessor_domain_kwargs["column"]
-
+        # this is a similar error to
         if column_name not in metrics["table.columns"]:
             raise ge_exceptions.InvalidMetricAccessorDomainKwargsKeyError(
                 message=f'Error: The column "{column_name}" in BatchData does not exist.'
@@ -2761,6 +2797,7 @@ class MapMetricProvider(MetricProvider):
                 # noinspection PyUnresolvedReferences
                 metric_name = cls.condition_metric_name
                 metric_domain_keys = cls.condition_domain_keys
+                print(f"this is the domain key that I want{metric_domain_keys}")
                 metric_value_keys = cls.condition_value_keys
                 metric_definition_kwargs = getattr(
                     condition_provider, "metric_definition_kwargs", {}
@@ -2797,7 +2834,7 @@ class MapMetricProvider(MetricProvider):
                         metric_value_keys=(*metric_value_keys, "result_format"),
                         execution_engine=engine,
                         metric_class=cls,
-                        metric_provider=_pandas_map_condition_index,
+                        metric_provider=_pandas_map_condition_rows,
                         metric_fn_type=MetricFunctionTypes.VALUE,
                     )
                     register_metric(
@@ -2815,7 +2852,7 @@ class MapMetricProvider(MetricProvider):
                         metric_value_keys=(*metric_value_keys, "result_format"),
                         execution_engine=engine,
                         metric_class=cls,
-                        metric_provider=_pandas_map_condition_rows,
+                        metric_provider=_pandas_maps_condition_unexpected_index_columns,
                         metric_fn_type=MetricFunctionTypes.VALUE,
                     )
 

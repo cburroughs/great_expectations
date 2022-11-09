@@ -489,7 +489,6 @@ not {batch_spec.__class__.__name__}"""
                 raise ge_exceptions.ValidationError(
                     f"Unable to find batch with batch_id {batch_id}"
                 )
-
         # Filtering by row condition.
         row_condition = domain_kwargs.get("row_condition", None)
         if row_condition:
@@ -505,9 +504,14 @@ not {batch_spec.__class__.__name__}"""
                 # Querying row condition
                 data = data.query(row_condition, parser=condition_parser)
 
-        if "column" in domain_kwargs:
+        if "unexpected_index_columns" in domain_kwargs:
+            # do a thing. Do it here
+            # https://stackoverflow.com/questions/11285613/selecting-multiple-columns-in-a-pandas-dataframe
+            data = data.loc[:, domain_kwargs["unexpected_index_columns"]]
             return data
 
+        if "column" in domain_kwargs:
+            return data
         if (
             "column_A" in domain_kwargs
             and "column_B" in domain_kwargs

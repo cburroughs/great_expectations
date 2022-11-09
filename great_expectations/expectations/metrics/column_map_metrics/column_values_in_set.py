@@ -31,6 +31,8 @@ class ColumnValuesInSet(ColumnMapMetricProvider):
         value_set,
         **kwargs,
     ):
+        print(f"here we are in the column_valuesfunction: {kwargs}")
+
         # no need to parse as datetime; just compare the strings as is
         parse_strings_as_datetimes: bool = (
             kwargs.get("parse_strings_as_datetimes") or False

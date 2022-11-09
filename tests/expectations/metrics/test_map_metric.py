@@ -423,6 +423,67 @@ def test_pandas_multiple_unexpected_index_columns_complete_result_format(
     }
 
 
+def test_pandas_single_unexpected_index_columns_complete_result_format_non_existing_column(
+    pandas_dataframe_for_unexpected_rows_with_index: pd.DataFrame,
+):
+    expectationConfiguration = ExpectationConfiguration(
+        expectation_type="expect_column_values_to_be_in_set",
+        kwargs={
+            "column": "numbers_with_duplicates",
+            "value_set": [1, 5, 22],
+            "result_format": {
+                "result_format": "COMPLETE",
+                "unexpected_index_columns": ["i_dont_exist"],  # Single column
+            },
+        },
+    )
+
+    expectation = ExpectColumnValuesToBeInSet(expectationConfiguration)
+    batch: Batch = Batch(data=pandas_dataframe_for_unexpected_rows_with_index)
+    engine = PandasExecutionEngine()
+    validator = Validator(
+        execution_engine=engine,
+        batches=[
+            batch,
+        ],
+    )
+    result = expectation.validate(validator)
+    pprint(convert_to_json_serializable(result.result))
+    # how do you do
+    # should this raise an error?
+    assert result.result == {}
+
+
+def test_pandas_multiple_unexpected_index_columns_one_missing_complete_result_format(
+    pandas_dataframe_for_unexpected_rows_with_index: pd.DataFrame,
+):
+    expectationConfiguration = ExpectationConfiguration(
+        expectation_type="expect_column_values_to_be_in_set",
+        kwargs={
+            "column": "numbers_with_duplicates",
+            "value_set": [1, 5, 22],
+            "result_format": {
+                "result_format": "COMPLETE",
+                "unexpected_index_columns": [
+                    "pk_1",
+                    "i_dont_exist",
+                ],  # Only 1 column is valid
+            },
+        },
+    )
+    expectation = ExpectColumnValuesToBeInSet(expectationConfiguration)
+    batch: Batch = Batch(data=pandas_dataframe_for_unexpected_rows_with_index)
+    engine = PandasExecutionEngine()
+    validator = Validator(
+        execution_engine=engine,
+        batches=[
+            batch,
+        ],
+    )
+    result = expectation.validate(validator)
+    pprint(convert_to_json_serializable(result))
+
+
 def test_pandas_default_to_not_include_unexpected_rows(
     dataframe_for_unexpected_rows, expected_evr_without_unexpected_rows
 ):

@@ -859,6 +859,7 @@ class Expectation(metaclass=MetaExpectation):
         execution_engine: Optional[ExecutionEngine] = None,
         **kwargs: dict,
     ) -> ExpectationValidationResult:
+        print("I run")
         if configuration is None:
             configuration = self.configuration
 
@@ -876,6 +877,7 @@ class Expectation(metaclass=MetaExpectation):
         for name, metric_edge_key in requested_metrics.items():
             provided_metrics[name] = metrics[metric_edge_key.id]
 
+        # and here is where we call the _validate method
         expectation_validation_result: Union[
             ExpectationValidationResult, dict
         ] = self._validate(
@@ -2266,6 +2268,9 @@ class ColumnMapExpectation(TableExpectation, ABC):
             metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
         )
 
+        print(f"**** metric_kwargs:{metric_kwargs}")
+        print(f"**** metric_dependencies: {metric_dependencies}")
+
         if include_unexpected_rows:
             metric_kwargs = get_metric_kwargs(
                 f"{self.map_metric}.unexpected_rows",
@@ -2314,6 +2319,7 @@ class ColumnMapExpectation(TableExpectation, ABC):
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
             dep = f"{self.map_metric}.unexpected_index_columns"
+        # is there something here?
         if isinstance(execution_engine, PandasExecutionEngine):
             metric_kwargs = get_metric_kwargs(
                 f"{self.map_metric}.unexpected_index_list",
@@ -2357,14 +2363,16 @@ class ColumnMapExpectation(TableExpectation, ABC):
         unexpected_values: Optional[List[Any]] = metrics.get(
             f"{self.map_metric}.unexpected_values"
         )
-        unexpected_index_list: Optional[List[int]] = metrics.get(
-            f"{self.map_metric}.unexpected_index_list"
-        )
+        unexpected_index_list = metrics.get(f"{self.map_metric}.unexpected_index_list")
+        # this is the metric that is returnedj
+        # we are just retrieving something that has already been calculated : this is where we have Pk_1,
         unexpected_index_columns = metrics.get(
             f"{self.map_metric}.unexpected_index_columns"
         )
+        # this isn't being loaded to the right palce
+        print(f"this is unexpected_index_columns: {unexpected_index_columns}")
         if unexpected_index_columns is not None:
-            unexpected_index_list: List[dict] = []
+            unexpected_index_list: Optional[List[dict]] = []
             index_columns = configuration.kwargs["result_format"][
                 "unexpected_index_columns"
             ]
@@ -2374,6 +2382,7 @@ class ColumnMapExpectation(TableExpectation, ABC):
                 for column in index_columns:
                     temp[column] = unexpected_index_columns.at[index, column]
                 unexpected_index_list.append(temp)
+
         unexpected_rows = None
         if include_unexpected_rows:
             unexpected_rows = metrics.get(f"{self.map_metric}.unexpected_rows")
@@ -2757,7 +2766,7 @@ class MulticolumnMapExpectation(TableExpectation, ABC):
                 metric_value_kwargs=metric_kwargs["metric_value_kwargs"],
             )
 
-        if include_unexpected_index_columns:
+        if configuration:
             metric_kwargs = get_metric_kwargs(
                 f"{self.map_metric}.unexpected_index_columns",
                 configuration=configuration,
