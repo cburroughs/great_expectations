@@ -4,8 +4,8 @@ from great_expectations.core.expectation_configuration import ExpectationConfigu
 from great_expectations.expectations.expectation import (
     ColumnMapExpectation,
     InvalidExpectationConfigurationError,
+    render_evaluation_parameter_string,
 )
-from great_expectations.expectations.util import render_evaluation_parameter_string
 from great_expectations.render import LegacyRendererType
 from great_expectations.render.renderer.renderer import renderer
 from great_expectations.render.util import substitute_none_for_missing
@@ -17,6 +17,8 @@ except ImportError:
 
 
 class ExpectColumnValuesToMatchLikePattern(ColumnMapExpectation):
+    """Expect the column entries to be strings that match a given like pattern expression."""
+
     library_metadata = {
         "maturity": "production",
         "tags": ["core expectation", "column map expectation"],
@@ -25,7 +27,7 @@ class ExpectColumnValuesToMatchLikePattern(ColumnMapExpectation):
         ],
         "requirements": [],
         "has_full_test_suite": True,
-        "manually_reviewed_code": False,
+        "manually_reviewed_code": True,
     }
 
     map_metric = "column_values.match_like_pattern"
@@ -76,9 +78,8 @@ class ExpectColumnValuesToMatchLikePattern(ColumnMapExpectation):
         **kwargs
     ) -> None:
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(

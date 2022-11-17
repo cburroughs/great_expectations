@@ -1,15 +1,17 @@
 from typing import Optional
 
 from great_expectations.core import ExpectationConfiguration
-from great_expectations.expectations.expectation import MulticolumnMapExpectation
-from great_expectations.expectations.util import render_evaluation_parameter_string
+from great_expectations.expectations.expectation import (
+    MulticolumnMapExpectation,
+    render_evaluation_parameter_string,
+)
 from great_expectations.render import LegacyDiagnosticRendererType, LegacyRendererType
 from great_expectations.render.renderer.renderer import renderer
 
 
 class ExpectMulticolumnSumToEqual(MulticolumnMapExpectation):
     """
-    Expects that the sum of row values is the same for each row, summing only values in columns specified in
+    Expect that the sum of row values is the same for each row, summing only values in columns specified in \
     column_list, and equal to the specific value, sum_total.
 
     Args:

@@ -5,13 +5,14 @@ from great_expectations.expectations.expectation import (
     ColumnMapExpectation,
     InvalidExpectationConfigurationError,
 )
-from great_expectations.render import LegacyDescriptiveRendererType, LegacyRendererType
-from great_expectations.render.renderer.renderer import renderer
-from great_expectations.render.types import (
+from great_expectations.render import (
+    LegacyDescriptiveRendererType,
+    LegacyRendererType,
     RenderedBulletListContent,
     RenderedStringTemplateContent,
     ValueListContent,
 )
+from great_expectations.render.renderer.renderer import renderer
 from great_expectations.render.util import (
     num_to_str,
     parse_row_condition_string_pandas_engine,
@@ -34,7 +35,7 @@ try:
     import sqlalchemy as sa  # noqa: F401
 except ImportError:
     pass
-from great_expectations.expectations.util import (
+from great_expectations.expectations.expectation import (
     add_values_with_json_schema_from_list_in_params,
     render_evaluation_parameter_string,
 )
@@ -193,9 +194,8 @@ class ExpectColumnValuesToBeInSet(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -291,9 +291,8 @@ class ExpectColumnValuesToBeInSet(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(

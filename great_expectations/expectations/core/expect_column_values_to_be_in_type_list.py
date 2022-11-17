@@ -18,15 +18,14 @@ from great_expectations.expectations.core.expect_column_values_to_be_of_type imp
     _get_dialect_type_module,
     _native_type_type_map,
 )
-from great_expectations.expectations.expectation import ColumnMapExpectation
-from great_expectations.expectations.registry import get_metric_kwargs
-from great_expectations.expectations.util import (
+from great_expectations.expectations.expectation import (
+    ColumnMapExpectation,
     add_values_with_json_schema_from_list_in_params,
     render_evaluation_parameter_string,
 )
-from great_expectations.render import LegacyRendererType
+from great_expectations.expectations.registry import get_metric_kwargs
+from great_expectations.render import LegacyRendererType, RenderedStringTemplateContent
 from great_expectations.render.renderer.renderer import renderer
-from great_expectations.render.types import RenderedStringTemplateContent
 from great_expectations.render.util import (
     num_to_str,
     parse_row_condition_string_pandas_engine,
@@ -154,9 +153,8 @@ class ExpectColumnValuesToBeInTypeList(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -254,9 +252,8 @@ class ExpectColumnValuesToBeInTypeList(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -540,8 +537,8 @@ class ExpectColumnValuesToBeInTypeList(ColumnMapExpectation):
         self,
         configuration: ExpectationConfiguration,
         metrics: Dict,
-        runtime_configuration: dict = None,
-        execution_engine: ExecutionEngine = None,
+        runtime_configuration: Optional[dict] = None,
+        execution_engine: Optional[ExecutionEngine] = None,
     ):
         column_name = configuration.kwargs.get("column")
         expected_types_list = configuration.kwargs.get("type_list")

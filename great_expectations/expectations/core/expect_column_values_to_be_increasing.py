@@ -2,11 +2,12 @@ import logging
 from typing import Optional
 
 from great_expectations.core.expectation_configuration import ExpectationConfiguration
-from great_expectations.expectations.expectation import ColumnMapExpectation
-from great_expectations.expectations.util import render_evaluation_parameter_string
-from great_expectations.render import LegacyRendererType
+from great_expectations.expectations.expectation import (
+    ColumnMapExpectation,
+    render_evaluation_parameter_string,
+)
+from great_expectations.render import LegacyRendererType, RenderedStringTemplateContent
 from great_expectations.render.renderer.renderer import renderer
-from great_expectations.render.types import RenderedStringTemplateContent
 from great_expectations.render.util import (
     num_to_str,
     parse_row_condition_string_pandas_engine,
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExpectColumnValuesToBeIncreasing(ColumnMapExpectation):
-    """Expect column values to be increasing.
+    """Expect the column values to be increasing.
 
     By default, this expectation only works for numeric or datetime data.
     When `parse_strings_as_datetimes=True`, it can also parse strings to datetimes.
@@ -108,9 +109,8 @@ class ExpectColumnValuesToBeIncreasing(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -193,9 +193,8 @@ class ExpectColumnValuesToBeIncreasing(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(

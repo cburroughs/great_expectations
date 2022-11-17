@@ -6,11 +6,14 @@ from great_expectations.execution_engine import ExecutionEngine
 from great_expectations.expectations.expectation import (
     ColumnMapExpectation,
     _format_map_output,
+    render_evaluation_parameter_string,
 )
-from great_expectations.expectations.util import render_evaluation_parameter_string
-from great_expectations.render import LegacyDiagnosticRendererType, LegacyRendererType
+from great_expectations.render import (
+    LegacyDiagnosticRendererType,
+    LegacyRendererType,
+    RenderedStringTemplateContent,
+)
 from great_expectations.render.renderer.renderer import renderer
-from great_expectations.render.types import RenderedStringTemplateContent
 from great_expectations.render.util import (
     num_to_str,
     parse_row_condition_string_pandas_engine,
@@ -19,7 +22,7 @@ from great_expectations.render.util import (
 
 
 class ExpectColumnValuesToBeNull(ColumnMapExpectation):
-    """Expect column values to be null.
+    """Expect the column values to be null.
 
     expect_column_values_to_be_null is a \
     :func:`column_map_expectation <great_expectations.execution_engine.execution_engine.MetaExecutionEngine
@@ -99,9 +102,8 @@ class ExpectColumnValuesToBeNull(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -161,9 +163,8 @@ class ExpectColumnValuesToBeNull(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -245,8 +246,8 @@ class ExpectColumnValuesToBeNull(ColumnMapExpectation):
         self,
         configuration: ExpectationConfiguration,
         metrics: Dict,
-        runtime_configuration: dict = None,
-        execution_engine: ExecutionEngine = None,
+        runtime_configuration: Optional[dict] = None,
+        execution_engine: Optional[ExecutionEngine] = None,
     ):
         result_format = self.get_result_format(
             configuration=configuration, runtime_configuration=runtime_configuration

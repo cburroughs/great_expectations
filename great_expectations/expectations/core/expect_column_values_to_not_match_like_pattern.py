@@ -4,15 +4,15 @@ from great_expectations.core.expectation_configuration import ExpectationConfigu
 from great_expectations.expectations.expectation import (
     ColumnMapExpectation,
     InvalidExpectationConfigurationError,
+    render_evaluation_parameter_string,
 )
-from great_expectations.expectations.util import render_evaluation_parameter_string
 from great_expectations.render import LegacyRendererType
 from great_expectations.render.renderer.renderer import renderer
 from great_expectations.render.util import substitute_none_for_missing
 
 
 class ExpectColumnValuesToNotMatchLikePattern(ColumnMapExpectation):
-    """Expect column entries to be strings that do NOT match a given like pattern expression.
+    """Expect the column entries to be strings that do NOT match a given like pattern expression.
 
     expect_column_values_to_not_match_like_pattern_list is a \
     :func:`column_map_expectation <great_expectations.execution_engine.execution_engine.MetaExecutionEngine
@@ -116,9 +116,8 @@ class ExpectColumnValuesToNotMatchLikePattern(ColumnMapExpectation):
         **kwargs
     ) -> None:
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(

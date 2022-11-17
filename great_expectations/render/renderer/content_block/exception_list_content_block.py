@@ -1,9 +1,9 @@
-from great_expectations.render.renderer.content_block.content_block import (
-    ContentBlockRenderer,
-)
-from great_expectations.render.types import (
+from great_expectations.render import (
     RenderedBulletListContent,
     RenderedStringTemplateContent,
+)
+from great_expectations.render.renderer.content_block.content_block import (
+    ContentBlockRenderer,
 )
 
 
@@ -63,9 +63,8 @@ class ExceptionListContentBlockRenderer(ContentBlockRenderer):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         # Only render EVR objects for which an exception was raised

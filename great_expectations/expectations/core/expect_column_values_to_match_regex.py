@@ -4,11 +4,10 @@ from great_expectations.core.expectation_configuration import ExpectationConfigu
 from great_expectations.expectations.expectation import (
     ColumnMapExpectation,
     InvalidExpectationConfigurationError,
+    render_evaluation_parameter_string,
 )
-from great_expectations.expectations.util import render_evaluation_parameter_string
-from great_expectations.render import LegacyRendererType
+from great_expectations.render import LegacyRendererType, RenderedStringTemplateContent
 from great_expectations.render.renderer.renderer import renderer
-from great_expectations.render.types import RenderedStringTemplateContent
 from great_expectations.render.util import (
     num_to_str,
     parse_row_condition_string_pandas_engine,
@@ -29,7 +28,7 @@ from great_expectations.rule_based_profiler.parameter_container import (
 
 
 class ExpectColumnValuesToMatchRegex(ColumnMapExpectation):
-    """Expect column entries to be strings that match a given regular expression.
+    """Expect the column entries to be strings that match a given regular expression.
 
     Valid matches can be found \
     anywhere in the string, for example "[at]+" will identify the following strings as expected: "cat", "hat", \
@@ -89,7 +88,7 @@ class ExpectColumnValuesToMatchRegex(ColumnMapExpectation):
         ],
         "requirements": [],
         "has_full_test_suite": True,
-        "manually_reviewed_code": False,
+        "manually_reviewed_code": True,
     }
 
     map_metric = "column_values.match_regex"
@@ -216,9 +215,8 @@ class ExpectColumnValuesToMatchRegex(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
@@ -285,9 +283,8 @@ class ExpectColumnValuesToMatchRegex(ColumnMapExpectation):
         **kwargs,
     ):
         runtime_configuration = runtime_configuration or {}
-        include_column_name = runtime_configuration.get("include_column_name", True)
         include_column_name = (
-            include_column_name if include_column_name is not None else True
+            False if runtime_configuration.get("include_column_name") is False else True
         )
         styling = runtime_configuration.get("styling")
         params = substitute_none_for_missing(
