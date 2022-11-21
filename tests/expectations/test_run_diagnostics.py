@@ -1,16 +1,11 @@
 import json
 
-import pandas as pd
 import pytest
 
-from great_expectations.core.batch import Batch
 from great_expectations.core.expectation_diagnostics.supporting_types import (
     ExpectationRendererDiagnostics,
 )
-from great_expectations.expectations.expectation import (
-    ColumnMapExpectation,
-    ExpectationConfiguration,
-)
+from great_expectations.expectations.expectation import ColumnMapExpectation
 from great_expectations.expectations.registry import _registered_expectations
 from tests.expectations.fixtures.expect_column_values_to_equal_three import (
     ExpectColumnValuesToEqualThree,
@@ -44,12 +39,18 @@ def test_expectation_self_check():
             "docstring": "",
         },
         "execution_engines": {
-            "PandasExecutionEngine": True,
-            "SqlAlchemyExecutionEngine": True,
-            "SparkDFExecutionEngine": True,
+            "PandasExecutionEngine": False,
+            "SqlAlchemyExecutionEngine": False,
+            "SparkDFExecutionEngine": False,
         },
         "gallery_examples": [],
         "renderers": [
+            {
+                "is_standard": False,
+                "is_supported": True,
+                "name": "atomic.diagnostic.failed",
+                "samples": [],
+            },
             {
                 "name": "atomic.diagnostic.observed_value",
                 "is_supported": True,
@@ -57,7 +58,7 @@ def test_expectation_self_check():
                 "samples": [],
             },
             {
-                "name": "atomic.prescriptive.kwargs",
+                "name": "atomic.prescriptive.failed",
                 "is_supported": True,
                 "is_standard": False,
                 "samples": [],
