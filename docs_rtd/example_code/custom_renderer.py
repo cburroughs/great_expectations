@@ -113,6 +113,7 @@ class CustomPageRenderer(Renderer):
             }
         )
 
+    # is this the tooltip string templaet
     @classmethod
     def _get_tooltip_string_template_content_block(cls):
         return RenderedStringTemplateContent(

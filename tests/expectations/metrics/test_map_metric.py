@@ -1596,3 +1596,7 @@ def test_sql_multiple_unexpected_index_column_names_complete_result_format_non_e
         result.exception_info["exception_message"]
         == 'Error: The unexpected_index_column: "i_dont_exist" in does not exist in SQL Table. Please check your configuration and try again.'
     )
+
+
+# testing to see if DataDocs can be built with this
+#

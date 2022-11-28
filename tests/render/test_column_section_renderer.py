@@ -1289,6 +1289,7 @@ def test_ValidationResultsColumnSectionRenderer_render_header_evr_with_unescaped
     }
 
 
+# this is a good EVR. and how do you convert to JSON dict?
 # noinspection PyPep8Naming
 def test_ValidationResultsColumnSectionRenderer_render_table(
     titanic_profiled_name_column_evrs,

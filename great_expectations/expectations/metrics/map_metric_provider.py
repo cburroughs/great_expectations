@@ -2397,7 +2397,6 @@ def _sqlalchemy_map_condition_query(
     query_as_string: str = sql_post_compile_to_string(
         engine=execution_engine.engine, select_statement=new_query
     )
-    print("hello")
     return query_as_string
 
 

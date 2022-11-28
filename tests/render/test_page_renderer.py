@@ -15,6 +15,8 @@ from great_expectations.render.renderer import (
     ValidationResultsPageRenderer,
 )
 
+# TODO this is where I want to do the testing
+
 
 def test_ExpectationSuitePageRenderer_render_expectation_suite_notes(
     empty_data_context,
@@ -262,6 +264,19 @@ def test_ValidationResultsPageRenderer_render_validation_header(
 
     pprint.pprint(validation_header)
     assert validation_header == expected_validation_header
+
+
+def test_ValidationResultsPageRenderer_render_validation(animals_profiled_evr):
+    validation_results_page_renderer = ValidationResultsPageRenderer(
+        run_info_at_end=False
+    )
+    # res = ValidationResultsPageRenderer._render_validation_info(validation_results=animals_profiled_evr).to_json_dict()
+    # print(res)
+    # print
+    res = validation_results_page_renderer.render(animals_profiled_evr)
+    print(res.to_json_dict())
+    print("done")
+    # YAY this contains what we need
 
 
 def test_ValidationResultsPageRenderer_render_validation_info(titanic_profiled_evrs_1):

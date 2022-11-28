@@ -34,6 +34,7 @@ class ContentBlockRenderer(Renderer):
     def validate_input(cls, render_object: Any) -> None:
         pass
 
+    # is this the content block tghat is the main loop?
     @classmethod
     def render(
         cls, render_object: Any, **kwargs
@@ -68,6 +69,7 @@ diagnose and repair the underlying issue.  Detailed information follows:
             data_docs_exception_message,
             kwargs,
         )
+        print(result)
         return result
 
     @classmethod

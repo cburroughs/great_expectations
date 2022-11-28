@@ -266,9 +266,14 @@ class Expectation(metaclass=MetaExpectation):
     @classmethod
     def _register_renderer_functions(cls) -> None:
         expectation_type: str = camel_to_snake(cls.__name__)
+        # if expectation_type == "expect_column_values_to_be_in_set":
+        #     print(f"dir cls : {dir(cls)}")
 
+        # this is hwere we have to register renderers
         for candidate_renderer_fn_name in dir(cls):
             attr_obj: Callable = getattr(cls, candidate_renderer_fn_name)
+            # print(f"register : {attr_obj}")
+
             if not hasattr(attr_obj, "_renderer_type"):
                 continue
             register_renderer(
@@ -382,6 +387,7 @@ class Expectation(metaclass=MetaExpectation):
         )
         return rendered
 
+    # these are the types of renderer dectorators we want to check
     @classmethod
     @renderer(renderer_type=LegacyRendererType.PRESCRIPTIVE)
     def _prescriptive_renderer(
@@ -627,6 +633,7 @@ class Expectation(metaclass=MetaExpectation):
 
         if success or not result_dict.get("unexpected_count"):
             return []
+
         else:
             unexpected_count = num_to_str(
                 result_dict["unexpected_count"], use_locale=True, precision=20
@@ -643,23 +650,169 @@ class Expectation(metaclass=MetaExpectation):
                 "$unexpected_percent of $element_count total rows."
             )
 
-            return [
-                RenderedStringTemplateContent(
-                    **{
-                        "content_block_type": "string_template",
-                        "string_template": {
-                            "template": template_str,
-                            "params": {
-                                "unexpected_count": unexpected_count,
-                                "unexpected_percent": unexpected_percent,
-                                "element_count": element_count,
-                            },
-                            "tag": "strong",
-                            "styling": {"classes": ["text-danger"]},
+            unexpected_message = RenderedStringTemplateContent(
+                **{
+                    "content_block_type": "string_template",
+                    "string_template": {
+                        "template": template_str,
+                        "params": {
+                            "unexpected_count": unexpected_count,
+                            "unexpected_percent": unexpected_percent,
+                            "element_count": element_count,
                         },
+                        "tag": "strong",
+                        "styling": {"classes": ["text-danger"]},
+                    },
+                }
+            )
+            return [unexpected_message]
+
+    @classmethod
+    @renderer(renderer_type=AtomicDiagnosticRendererType.UNEXPECTED_INDICES)
+    def _unexpected_indices(
+        cls,
+        configuration: ExpectationConfiguration,
+        result: Optional[ExpectationValidationResult] = None,
+        language: Optional[str] = None,
+        runtime_configuration: Optional[dict] = None,
+        **kwargs: dict,
+    ):
+        """
+        New renderer that will output unexpected indices into DataDocs if it is available
+
+        What are the parameters that it is interested in:
+            input
+            - unexpected_index_column_names : this is the list of columns that are used as primary key
+            output
+            - partial_unexpected_index_list: only the partial (and only 5?)
+            - unexpected_index_query: only for sql
+
+        What are the gotchas?
+            - there is going to be a table?
+            - The table can have unexpected index column names
+            - or it can just be the table [only for pandas for now]
+        """
+        if runtime_configuration:
+            styling = runtime_configuration.get("styling")
+        else:
+            styling = {}
+
+        result_dict: Optional[dict] = result.result
+        if result_dict is None:
+            return None
+
+        # this is our bare minimum
+        # if not result_dict.get("partial_unexpected_index_list"):
+        #    return None
+
+        if configuration["kwargs"]["result_format"].get(
+            "unexpected_index_column_names"
+        ):
+            index_column_names: List[str] = configuration["kwargs"]["result_format"][
+                "unexpected_index_column_names"
+            ]
+            # if we have index column names then we are going to be adding a differe
+
+            # for i, v in enumerate(params["value_set"]):
+            #    params[f"v__{str(i)}"] = v
+
+            # values_string = " ".join(
+            #    [f"$v__{str(i)}" for i, v in enumerate(params["value_set"])]
+            # )
+
+            # what do we want to do?
+            # 1. output a string
+            # we have defined the following primary key strings to define unexpected indices:
+            # 2. adding rows to a table
+            # key key value
+            # [ ] [ ] [ ]
+            # 3. To get query for full results run the following query
+
+            # for i, v in enumerate(params["value_set"]):
+            #     params[f"v__{str(i)}"] = v
+            # values_string = " ".join(
+            #     [f"$v__{str(i)}" for i, v in enumerate(params["value_set"])]
+            # )
+            #
+            # if include_column_name:
+            #     template_str = (
+            #         f"$column distinct values must belong to this set: {values_string}."
+            #     )
+            template_str: str = (
+                f"\n\n We have defined the following columns as primary keys: $v__0"
+            )
+            unexpected_message = RenderedStringTemplateContent(
+                **{
+                    "content_block_type": "string_template",
+                    "string_template": {
+                        "template": template_str,
+                        "styling": styling,
+                        "params": {
+                            # TODO this is really brittle
+                            # TODO make sure the formatting is correct
+                            "v__0": index_column_names[0],
+                        },
+                    },
+                }
+            )
+
+            # adding indices table
+            header_row = []
+            table_rows = []
+            unexpected_index_list = result_dict["unexpected_index_list"]
+            # first add the column names
+            for column_name in index_column_names:
+                header_row.append(column_name)
+
+            # now process the values
+            for val in unexpected_index_list:
+                for column_name in index_column_names:
+                    table_rows.append([val[column_name]])
+
+            unexpected_indices_table_content_block = RenderedTableContent(
+                **{
+                    "content_block_type": "table",
+                    "table": table_rows,
+                    "header_row": header_row,
+                    "styling": {
+                        "body": {"classes": ["table-bordered", "table-sm", "mt-3"]}
+                    },
+                }
+            )
+
+            if result_dict.get("unexpected_index_query"):
+                # how do you add a new rendererj
+                # unexpected index table is next
+                query = result_dict.get("unexpected_index_query")
+                query_info = CollapseContent(
+                    **{
+                        "collapse_toggle_link": "Show new query for Unexpected Rows...",
+                        "collapse": [
+                            RenderedStringTemplateContent(
+                                **{
+                                    "content_block_type": "string_template",
+                                    "string_template": {
+                                        "template": query,
+                                        "tag": "code",
+                                    },
+                                }
+                            )
+                        ],
                     }
                 )
-            ]
+                return [
+                    unexpected_message,
+                    unexpected_indices_table_content_block,
+                    query_info,
+                ]
+            return [unexpected_message, unexpected_indices_table_content_block]
+
+        else:
+            # TODO: this path is going to be the table used by Pandas (for now), since we want to output tables
+            # even without `unexpected_index_column_names` which defines PK columns
+            # currently returning None
+            print("I am here!")
+            return None
 
     @classmethod
     @renderer(renderer_type=LegacyDiagnosticRendererType.UNEXPECTED_TABLE)
@@ -710,6 +863,8 @@ class Expectation(metaclass=MetaExpectation):
 
             # Check to see if we have *all* of the unexpected values accounted for. If so,
             # we show counts. If not, we only show "sampled" unexpected values.
+            # this might be it
+            # how do we know that this is pulled in?
             if total_count == result_dict.get("unexpected_count"):
                 header_row = ["Unexpected Value", "Count"]
             else:
@@ -1624,6 +1779,7 @@ class Expectation(metaclass=MetaExpectation):
 
         if not standard_renderers:
             standard_renderers = [
+                AtomicDiagnosticRendererType.UNEXPECTED_INDICES,
                 LegacyRendererType.ANSWER,
                 LegacyDiagnosticRendererType.UNEXPECTED_STATEMENT,
                 LegacyDiagnosticRendererType.OBSERVED_VALUE,

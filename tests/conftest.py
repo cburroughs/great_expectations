@@ -2001,6 +2001,14 @@ def filesystem_csv_4(tmp_path):
 
 
 @pytest.fixture
+def animals_profiled_evr():
+    with open(
+        file_relative_path(__file__, "./render/fixtures/animals_with_pk_evr.json"),
+    ) as infile:
+        return expectationSuiteValidationResultSchema.loads(infile.read())
+
+
+@pytest.fixture
 def titanic_profiled_evrs_1():
     with open(
         file_relative_path(

@@ -429,6 +429,8 @@ diagnose and repair the underlying issue.  Detailed information follows:
         content_blocks += unrendered_blocks
 
 
+#
+# this is the acual renderer. Do we want to be able to
 class ValidationResultsColumnSectionRenderer(ColumnSectionRenderer):
     def __init__(self, table_renderer=None) -> None:
         super().__init__()
@@ -483,6 +485,7 @@ class ValidationResultsColumnSectionRenderer(ColumnSectionRenderer):
         content_blocks = []
         remaining_evrs, content_block = self._render_header(validation_results)
         content_blocks.append(content_block)
+        # this is where we add the content block
         remaining_evrs, content_block = self._render_table(
             remaining_evrs, evaluation_parameters
         )

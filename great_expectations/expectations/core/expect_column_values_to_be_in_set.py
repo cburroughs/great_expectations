@@ -367,6 +367,7 @@ class ExpectColumnValuesToBeInSet(ColumnMapExpectation):
         runtime_configuration=None,
         **kwargs,
     ):
+        # is this where we need this sort of rendering
         assert result, "Must pass in result."
         if "partial_unexpected_counts" in result.result:
             partial_unexpected_counts = result.result["partial_unexpected_counts"]
@@ -375,6 +376,15 @@ class ExpectColumnValuesToBeInSet(ColumnMapExpectation):
             values = [str(item) for item in result.result["partial_unexpected_list"]]
         else:
             return
+        if "partial_unexpected_index_list" in result.result:
+            partial_unexpected_index_list = result.result[
+                "partial_unexpected_index_list"
+            ]
+            values = [str(v["value"]) for v in partial_unexpected_index_list]
+
+        if "unexpected_index_query" in result.result:
+            unexpected_index_query = result.result["unexpected_index_query"]
+            values = unexpected_index_query
 
         classes = ["col-3", "mt-1", "pl-1", "pr-1"]
 
@@ -384,7 +394,7 @@ class ExpectColumnValuesToBeInSet(ColumnMapExpectation):
         else:
             content_block_type = "value_list"
             content_block_class = ValueListContent
-
+        # this is where we would want to add
         new_block = content_block_class(
             **{
                 "content_block_type": content_block_type,

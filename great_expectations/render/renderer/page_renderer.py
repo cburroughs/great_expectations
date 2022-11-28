@@ -262,7 +262,7 @@ class ValidationResultsPageRenderer(Renderer):
                     evaluation_parameters=validation_results.evaluation_parameters,
                 )
             ]
-
+        # TODO: this is where we need to have the sections, but we dont have them here
         sections += [
             self._column_section_renderer.render(
                 validation_results=columns[column],
@@ -270,6 +270,7 @@ class ValidationResultsPageRenderer(Renderer):
             )
             for column in ordered_columns
         ]
+        print(f"sections: {sections}")
         if self.run_info_at_end:
             sections += [
                 RenderedSectionContent(

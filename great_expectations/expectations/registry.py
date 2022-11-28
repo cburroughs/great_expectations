@@ -64,7 +64,7 @@ def register_renderer(
             renderer_name: (parent_class, renderer_fn)
         }
         return
-
+    yes = _registered_renderers[object_name]
     if renderer_name in _registered_renderers[object_name]:
         if _registered_renderers[object_name][renderer_name] == (
             parent_class,
@@ -86,6 +86,8 @@ def register_renderer(
             )
         return
     else:
+        if object_name == "expect_column_values_to_be_in_set":
+            print(f"registering {renderer_name} for expectation_type {object_name}")
         logger.debug(f"Registering {renderer_name} for expectation_type {object_name}.")
         _registered_renderers[object_name][renderer_name] = (parent_class, renderer_fn)
         return
@@ -170,6 +172,7 @@ def register_metric(
         Union[MetricFunctionTypes, MetricPartialFunctionTypes]
     ] = None,
 ) -> dict:
+    # print("I am running")
     res = {}
     execution_engine_name = execution_engine.__name__
     logger.debug(f"Registering metric: {metric_name}")

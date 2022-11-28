@@ -41,9 +41,17 @@ class AtomicDiagnosticRendererType(str, Enum):
 
     FAILED = ".".join([AtomicRendererType.DIAGNOSTIC, "failed"])
     OBSERVED_VALUE = ".".join([AtomicRendererType.DIAGNOSTIC, "observed_value"])
+    UNEXPECTED_INDICES = ".".join([AtomicRendererType.DIAGNOSTIC, "unexpected_indices"])
 
     def __str__(self):
         return self.value
+
+
+# class AtomicQueryRendererType(str, Enum):
+#    """ These are the ones that we want to pull into"""
+#    QUERY = "query"
+#    def __str__(self):
+#        return self.value
 
 
 class LegacyRendererType(str, Enum):
@@ -380,6 +388,7 @@ class RenderedContentBlockContainer(RenderedComponentContent):
         return d
 
 
+# this is a Markdown Content that we can use too
 class RenderedMarkdownContent(RenderedComponentContent):
     def __init__(self, markdown, styling=None, content_block_type="markdown") -> None:
         super().__init__(content_block_type=content_block_type, styling=styling)
@@ -445,6 +454,7 @@ class RenderedBulletListContent(RenderedComponentContent):
         return d
 
 
+# one more candidates
 class ValueListContent(RenderedComponentContent):
     def __init__(
         self,
@@ -501,6 +511,7 @@ class TextContent(RenderedComponentContent):
         return d
 
 
+# another way that we can do this
 class CollapseContent(RenderedComponentContent):
     def __init__(
         self,

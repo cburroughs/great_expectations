@@ -1,0 +1,41 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "animal_names_exp",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "ge_cloud_id": null,
+      "kwargs": {
+        "column": "animals",
+        "value_set": [
+          "cat",
+          "fish",
+          "dog"
+        ],
+        "result_format": {
+          "result_format": "COMPLETE",
+          "unexpected_index_column_names": [
+            "key_1"
+          ]
+        }
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "citations": [
+      {
+        "batch_request": {
+          "data_asset_name": "Titanic.csv",
+          "data_connector_name": "default_inferred_data_connector_name",
+          "datasource_name": "my_datasource",
+          "limit": 1000
+        },
+        "citation_date": "2021-10-19T23:24:33.681234Z",
+        "comment": "Created suite added via CLI"
+      }
+    ],
+    "great_expectations_version": "0.13.37+20.g863890e.dirty"
+  }
+}

@@ -459,8 +459,11 @@ class DefaultSiteSectionBuilder:
                     )
 
             try:
-                rendered_content = self.renderer_class.render(resource)
+                # at this point we have the returned rendered pieces
+                # print(f"renderer_class: {self.renderer_class}")
 
+                rendered_content = self.renderer_class.render(resource)
+                # print(f"rendered_content: {rendered_content}")
                 if self.ge_cloud_mode:
                     self.target_store.set(
                         GXCloudIdentifier(
