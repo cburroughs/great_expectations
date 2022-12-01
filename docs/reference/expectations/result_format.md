@@ -12,6 +12,8 @@ The `result_format` parameter may be either a string or a dictionary which speci
     * `include_unexpected_rows`: When running validations, this will return the entire row for each unexpected value in
       dictionary form. When using `include_unexpected_rows`, you must explicitly specify `result_format` as well, and
       `result_format` must be more verbose than `BOOLEAN_ONLY`. *WARNING: *
+    * `unexpected_index_column_names`: When running validations, this will allow you specify primary key column(s) 
+        that will identify the rows in the table or Dataframe that contain the unexpected values. (pandas and sql only).
 
   :::warning
   `include_unexpected_rows` returns EVERY row for each unexpected value; for large tables, this could return an 
@@ -71,16 +73,17 @@ cases for working with Great Expectations, including interactive exploratory wor
 |    missing_percent                    |no              |yes             |yes             |yes             |
 |    details (dictionary)               |Defined on a per-expectation basis                                 |
 ### Fields defined for `column_map_expectation` type Expectations
-| Fields within `result`                |BOOLEAN_ONLY    |BASIC           |SUMMARY         |COMPLETE        |
-----------------------------------------|----------------|----------------|----------------|-----------------
-|    unexpected_count                   |no              |yes             |yes             |yes             |
-|    unexpected_percent                 |no              |yes             |yes             |yes             |
-|    unexpected_percent_nonmissing      |no              |yes             |yes             |yes             |
-|    partial_unexpected_list            |no              |yes             |yes             |yes             |
-|    partial_unexpected_index_list      |no              |no              |yes             |yes             |
-|    partial_unexpected_counts          |no              |no              |yes             |yes             |
-|    unexpected_index_list              |no              |no              |no              |yes             |
-|    unexpected_list                    |no              |no              |no              |yes             |
+| Fields within `result`            |BOOLEAN_ONLY    |BASIC           |SUMMARY         |COMPLETE        |
+------------------------------------|----------------|----------------|----------------|-----------------
+|   unexpected_count                |no              |yes             |yes             |yes             |
+|   unexpected_percent              |no              |yes             |yes             |yes             |
+|   unexpected_percent_nonmissing   |no              |yes             |yes             |yes             |
+|   partial_unexpected_list         |no              |yes             |yes             |yes             |
+|   partial_unexpected_index_list   |no              |no              |yes             |yes             |
+|   partial_unexpected_counts       |no              |no              |yes             |yes             |
+|   unexpected_index_list           |no              |no              |no              |yes             |
+|   unexpected_list                 |no              |no              |no              |yes             |
+|   unexpected_index_query (sql)    |no              |no              |no              |yes             |
 ### Fields defined for `column_aggregate_expectation` type Expectations
 | Fields within `result`                |BOOLEAN_ONLY    |BASIC           |SUMMARY         |COMPLETE        |
 ----------------------------------------|----------------|----------------|----------------|-----------------
