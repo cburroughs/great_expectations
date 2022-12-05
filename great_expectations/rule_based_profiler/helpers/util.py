@@ -22,11 +22,11 @@ from great_expectations.core.batch import (
     RuntimeBatchRequest,
     materialize_batch_request,
 )
-from great_expectations.core.metric_domain_types import MetricDomainTypes
-from great_expectations.rule_based_profiler.domain import (
+from great_expectations.core.domain import (
     INFERRED_SEMANTIC_TYPE_KEY,
     SemanticDomainTypes,
 )
+from great_expectations.core.metric_domain_types import MetricDomainTypes
 from great_expectations.rule_based_profiler.estimators.numeric_range_estimation_result import (
     NUM_HISTOGRAM_BINS,
     NumericRangeEstimationResult,
@@ -156,10 +156,18 @@ def get_batch_ids(
 
     batch_ids: List[str] = [batch.id for batch in batch_list]
 
-    if limit is not None:
-        batch_ids = batch_ids[0:limit]
-
     num_batch_ids: int = len(batch_ids)
+
+    if limit is not None:
+        # No need to verify that type of "limit" is "integer", because static type checking already ascertains this.
+        if not (0 <= limit <= num_batch_ids):
+            raise ge_exceptions.ProfilerExecutionError(
+                message=f"""{__name__}.get_batch_ids() allows integer limit values between 0 and {num_batch_ids} \
+({limit} was requested).
+"""
+            )
+        batch_ids = batch_ids[-limit:]
+
     if num_batch_ids == 0:
         raise ge_exceptions.ProfilerExecutionError(
             message=f"""{__name__}.get_batch_ids() must return at least one batch_id ({num_batch_ids} were retrieved).
