@@ -9,6 +9,7 @@
     @import "pygments.scss";
     @import "basic-modified.scss";
     @import "pydata-sphinx-theme-modified.scss";
+    @import url('/fonts/fontawesome/6.1.2/css/all.min.css');
 
     // Mirror `code` selector for `cite` for inline code snippets in docstrings using backticks: ``
     cite {

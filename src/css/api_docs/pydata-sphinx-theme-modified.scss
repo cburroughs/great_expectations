@@ -10347,10 +10347,16 @@ span.versionmodified {
   font-weight: 600
 }
 
+// asdasdf asdfsdf
+
 span.versionmodified:before {
   color: var(--pst-color-info);
-  content: var(--pst-icon-versionmodified-default);
+  //content: var(--pst-icon-versionmodified-default);
+  content: "\f05a";
   font-family: Font Awesome\ 6 Free;
+  //src: url('/fonts/fontawesome/6.1.2/webfonts/fa-regular-400.woff2');
+  //src: url('/fonts/fontawesome/6.1.2/webfonts/fa-solid-900.woff2');
+  //src: url('/fonts/fontawesome/6.1.2/webfonts/fa-v4compatibility.woff2');
   font-style: normal;
   font-weight: 900;
   margin-right: .6rem
