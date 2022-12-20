@@ -143,8 +143,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         variables:
           IMAGE_SUFFIX: $[ dependencies.make_suffix.outputs['suffix.IMAGE_SUFFIX'] ]
           GE_USAGE_STATISTICS_URL: "https://qa.stats.greatexpectations.io/great_expectations/v1/usage_statistics"
@@ -188,8 +186,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         services:
           postgres: postgres
         variables:
@@ -246,8 +242,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         variables:
           IMAGE_SUFFIX: $[ dependencies.make_suffix.outputs['suffix.IMAGE_SUFFIX'] ]
         steps:
@@ -274,8 +268,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         variables:
           IMAGE_SUFFIX: $[ dependencies.make_suffix.outputs['suffix.IMAGE_SUFFIX'] ]
         steps:
@@ -304,8 +296,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         services:
           mysql: mysql
         variables:
@@ -352,8 +342,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         services:
           trino: trino
         variables:
@@ -390,8 +378,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         services:
           postgres: postgres
         variables:
@@ -424,10 +410,6 @@ stages:
               min_pandas: '1.1.3'
             Python310:
               python.version: '3.10'
-              min_numpy: '1.19.3'
-              min_pandas: '1.1.3'
-            Python311:
-              python.version: '3.11'
               min_numpy: '1.19.3'
               min_pandas: '1.1.3'
         variables:
@@ -463,8 +445,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         variables:
           IMAGE_SUFFIX: $[ dependencies.make_suffix.outputs['suffix.IMAGE_SUFFIX'] ]
         steps:
@@ -489,8 +469,6 @@ stages:
               python.version: '3.9'
             Python310:
               python.version: '3.10'
-            Python311:
-              python.version: '3.11'
         variables:
           IMAGE_SUFFIX: $[ dependencies.make_suffix.outputs['suffix.IMAGE_SUFFIX'] ]
         steps:
@@ -531,9 +509,6 @@ stages:
              python.version: '3.9'
            Python310:
              python.version: '3.10'
-           Python311:
-             python.version: '3.11'
-
         steps:
          - task: UsePythonVersion@0
            inputs:
